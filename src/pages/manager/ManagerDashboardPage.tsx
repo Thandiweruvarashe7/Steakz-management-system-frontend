@@ -1,11 +1,10 @@
-import { TrendingUp, Users, CalendarDays, ShoppingCart, Plus, MapPin, AlertCircle, RefreshCw } from 'lucide-react'
+import { Users, CalendarDays, ShoppingCart, Plus, MapPin, AlertCircle, RefreshCw } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { StatsCard } from '@/components/ui/StatsCard'
 import { RevenueChart } from '@/components/charts/RevenueChart'
 import { OrdersChart } from '@/components/charts/OrdersChart'
-import { formatCurrency } from '@/lib/utils'
 import { analyticsService } from '@/services/analytics.service'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -26,8 +25,6 @@ export function ManagerDashboardPage() {
   })
 
   console.log('[ManagerDashboard] Dashboard data:', dashboard)
-
-  const revenueNum = dashboard ? parseFloat(dashboard.revenueToday.replace('£', '').replace(',', '')) : 0
 
   return (
     <div>
@@ -50,8 +47,7 @@ export function ManagerDashboardPage() {
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        <StatsCard icon={TrendingUp} label="Today's Revenue" value={isLoading ? '…' : formatCurrency(revenueNum)} />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <StatsCard icon={Users} label="Staff on Shift" value={isLoading ? '…' : String(dashboard?.staffOnShift ?? 0)} />
         <StatsCard icon={CalendarDays} label="Reservations Today" value={isLoading ? '…' : String(dashboard?.todayReservations ?? 0)} />
         <StatsCard icon={ShoppingCart} label="Active Orders" value={isLoading ? '…' : String(dashboard?.activeOrders ?? 0)} />
