@@ -142,6 +142,18 @@ export function CheckoutPage() {
       console.log('[AUDIT] ORDER_PLACED user:', user?.id, '| total:', total, '| branchId:', branchId, '| orderType:', orderType)
 
       const savedOrder = response.data.order
+
+      // Create a payment record for online payments so revenue is tracked
+      if (payWhen === 'online' && savedOrder?.id) {
+        const backendMethod = (onlineMethod === 'APPLE_PAY' || onlineMethod === 'GOOGLE_PAY') ? 'CONTACTLESS' : 'CARD'
+        try {
+          await apiClient.post('/payments', { orderId: savedOrder.id, method: backendMethod })
+          console.log('[Checkout] Payment record created for order:', savedOrder.id, '| method:', backendMethod)
+        } catch (payErr) {
+          console.warn('[Checkout] Payment record creation failed (non-fatal):', payErr)
+        }
+      }
+
       clearBasket()
 
       qc.invalidateQueries({ queryKey: ['orders'] })

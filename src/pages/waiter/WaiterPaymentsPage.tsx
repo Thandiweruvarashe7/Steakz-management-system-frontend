@@ -32,8 +32,10 @@ export function WaiterPaymentsPage() {
 
   const paymentMutation = useMutation({
     mutationFn: async (orderId: string) => {
-      console.log('[Payments] Processing payment for order:', orderId, '| method:', method)
-      const r = await apiClient.patch(`/orders/${orderId}/status`, { status: 'PAID' })
+      // Map UI method to backend-accepted values
+      const backendMethod = method === 'MOBILE' ? 'CONTACTLESS' : method
+      console.log('[Payments] Processing payment for order:', orderId, '| method:', backendMethod)
+      const r = await apiClient.post('/payments', { orderId, method: backendMethod })
       return r.data
     },
     onSuccess: () => {
