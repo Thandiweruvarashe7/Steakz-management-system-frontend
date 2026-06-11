@@ -71,42 +71,47 @@ export function RevenueChart({ data: dataProp, title = 'Revenue This Week', bran
     refetchIntervalInBackground: false,
   })
 
-  // Use data if it exists and has points.
-  // Only fall back to MOCK_REVENUE when liveData is undefined (first-ever load, nothing
-  // in cache). With staleTime: Infinity and gcTime: Infinity, once data is fetched it
-  // stays in cache permanently and liveData is never wiped between renders/remounts.
+  // liveData === undefined  →  still loading (no cache yet), show skeleton via MOCK_REVENUE
+  // liveData === []         →  loaded but no data for this period, show empty-state message
+  // liveData has points     →  show real data
+  const isEmpty = liveData !== undefined && liveData.length === 0
   const chartData: RevenueDataPoint[] =
-    liveData !== undefined && liveData.length > 0
+    liveData && liveData.length > 0
       ? liveData
-      : liveData === undefined
-        ? (dataProp ?? MOCK_REVENUE)
-        : (dataProp ?? [])
+      : (dataProp ?? MOCK_REVENUE)
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-6">
       <h3 className="font-serif font-semibold text-maroon mb-4">{title}</h3>
-      <ResponsiveContainer width="100%" height={280}>
-        <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-          <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-          <YAxis tickFormatter={(v) => `£${(v / 1000).toFixed(1)}k`} tick={{ fontSize: 12 }} />
-          <Tooltip
-            formatter={(value, name) => {
-              if (name === 'revenue') return [formatCurrency(value as number), 'Revenue']
-              return [value, name]
-            }}
-          />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="revenue"
-            stroke="#6D071A"
-            strokeWidth={2}
-            dot={{ fill: '#6D071A', r: 4 }}
-            name="revenue"
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      {isEmpty ? (
+        <div className="flex items-center justify-center" style={{ height: 280 }}>
+          <p className="text-sm text-gray-400">No revenue data for this period.</p>
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height={280}>
+          <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+            <YAxis tickFormatter={(v) => `£${(v / 1000).toFixed(1)}k`} tick={{ fontSize: 12 }} />
+            <Tooltip
+              formatter={(value, name) => {
+                if (name === 'revenue') return [formatCurrency(value as number), 'Revenue']
+                return [value, name]
+              }}
+            />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="revenue"
+              stroke="#6D071A"
+              strokeWidth={2}
+              dot={{ fill: '#6D071A', r: 4 }}
+              name="revenue"
+              isAnimationActive={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
     </div>
   )
 }
