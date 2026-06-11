@@ -59,9 +59,9 @@ apiClient.interceptors.response.use(
       console.error('[Axios] URL attempted:', `${BASE_URL}${requestPath}`)
       console.error('[Axios] Error code:', error.code)
       console.error('[Axios] Error message:', error.message)
-      console.error('[Axios] Is the backend running on port 5000? Try: cd backendsteaks && npm run dev')
+      console.error('[Axios] Backend URL configured as:', BASE_URL, '— check VITE_API_URL and that the backend is reachable')
       return Promise.reject({
-        message: `Cannot connect to backend. Ensure the API server is running on port 5000. (${error.message})`,
+        message: `Cannot connect to backend at ${BASE_URL}. (${error.message})`,
         code: 'NETWORK_ERROR',
         statusCode: 0,
         details: { url: `${BASE_URL}${requestPath}`, originalMessage: error.message },
