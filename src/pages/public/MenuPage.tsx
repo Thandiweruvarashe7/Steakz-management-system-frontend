@@ -48,7 +48,33 @@ export function MenuPage() {
     refetchInterval: 60_000,
   })
 
-  const allMenuItems: MenuItem[] = liveMenuData?.menuItems ?? liveMenuData?.items ?? (Array.isArray(liveMenuData) ? liveMenuData : STATIC_MENU_ITEMS)
+  function extractItems(data: unknown): MenuItem[] {
+    if (!data || typeof data !== 'object') return STATIC_MENU_ITEMS
+    const d = data as Record<string, unknown>
+    if (Array.isArray(d)) return d as MenuItem[]
+    if (Array.isArray(d.menuItems)) return d.menuItems as MenuItem[]
+    if (Array.isArray(d.items)) return d.items as MenuItem[]
+    if (Array.isArray(d.categories)) {
+      return (d.categories as Array<{ name: string; items: unknown[] }>).flatMap((cat) =>
+        (cat.items ?? []).map((item) => {
+          const i = item as Record<string, unknown>
+          return {
+            id:          i.id as string,
+            name:        i.name as string,
+            description: (i.description as string) ?? '',
+            price:       typeof i.price === 'string' ? parseFloat(i.price as string) : (i.price as number),
+            category:    cat.name as MenuCategory,
+            imageUrl:    i.imageUrl as string | undefined,
+            isAvailable: i.isAvailable as boolean,
+            allergens:   [] as string[],
+          }
+        })
+      )
+    }
+    return STATIC_MENU_ITEMS
+  }
+
+  const allMenuItems: MenuItem[] = extractItems(liveMenuData)
   console.log('[MenuPage] Menu items loaded:', allMenuItems.length, '| source:', liveMenuData ? 'API' : 'STATIC_FALLBACK')
 
   const filtered = useMemo(() => {
