@@ -51,8 +51,18 @@ export function WaiterPaymentsPage() {
       toast({ title: 'Payment processed — order moved to Receipts', variant: 'success' })
     },
     onError: (err: unknown) => {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? 'Payment failed'
+      const errObj = err as { statusCode?: number; message?: string }
       console.error('[Payments] Error processing payment:', err)
+      if (errObj.statusCode === 409) {
+        // Order already has a payment recorded — still refresh so UI stays in sync
+        setSelected(null)
+        qc.invalidateQueries({ queryKey: ['orders', 'awaiting-payment'] })
+        qc.invalidateQueries({ queryKey: ['revenue-trend'] })
+        qc.invalidateQueries({ queryKey: ['branch-dashboard'] })
+        toast({ title: 'Payment already recorded for this order', variant: 'success' })
+        return
+      }
+      const msg = errObj.message ?? 'Payment failed'
       toast({ title: msg, variant: 'destructive' })
     },
   })

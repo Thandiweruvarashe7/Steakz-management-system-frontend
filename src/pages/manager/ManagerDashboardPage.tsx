@@ -20,7 +20,7 @@ export function ManagerDashboardPage() {
       return analyticsService.getBranchDashboard(user?.branchId)
     },
     refetchInterval: 30_000,
-    staleTime: 0,
+    staleTime: 30_000,
     refetchOnMount: true,
     refetchOnWindowFocus: false,
   })

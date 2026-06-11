@@ -54,7 +54,13 @@ export function RevenueChart({ data: dataProp, title = 'Revenue This Week', bran
       console.log('[RevenueChart] Fetching GET /analytics/revenue', params)
       const response = await apiClient.get('/analytics/revenue', { params })
       const raw = response.data
-      // Backend returns { series: [...] } — also handles array or { data: [...] } shapes
+      // Validate this is a real analytics response (has 'series' key or is an array)
+      // If it lacks 'series' it's likely a rate-limit fallback — throw so TanStack keeps previous data
+      const hasValidShape = raw && (Array.isArray(raw) || 'series' in raw || 'data' in raw)
+      if (!hasValidShape) {
+        console.warn('[RevenueChart] Response missing series key — likely a bad response, preserving previous data')
+        throw new Error('Invalid analytics response shape')
+      }
       const series: RevenueDataPoint[] =
         raw?.series ?? (Array.isArray(raw) ? raw : raw?.data ?? [])
       console.log('[RevenueChart] Revenue series received:', series.length, 'points | branchId:', branchId ?? 'all')
@@ -72,10 +78,6 @@ export function RevenueChart({ data: dataProp, title = 'Revenue This Week', bran
     refetchIntervalInBackground: false,
   })
 
-  // liveData === undefined  →  still loading (no cache yet), show skeleton via MOCK_REVENUE
-  // liveData === []         →  loaded but no data for this period, show empty-state message
-  // liveData has points     →  show real data
-  const isEmpty = liveData !== undefined && liveData.length === 0
   const chartData: RevenueDataPoint[] =
     liveData && liveData.length > 0
       ? liveData
@@ -84,35 +86,30 @@ export function RevenueChart({ data: dataProp, title = 'Revenue This Week', bran
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-6">
       <h3 className="font-serif font-semibold text-maroon mb-4">{title}</h3>
-      {isEmpty ? (
-        <div className="flex items-center justify-center" style={{ height: 280 }}>
-          <p className="text-sm text-gray-400">No revenue data for this period.</p>
-        </div>
-      ) : (
-        <ResponsiveContainer width="100%" height={280}>
-          <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-            <YAxis tickFormatter={(v) => `£${(v / 1000).toFixed(1)}k`} tick={{ fontSize: 12 }} />
-            <Tooltip
-              formatter={(value, name) => {
-                if (name === 'revenue') return [formatCurrency(value as number), 'Revenue']
-                return [value, name]
-              }}
-            />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="revenue"
-              stroke="#6D071A"
-              strokeWidth={2}
-              dot={{ fill: '#6D071A', r: 4 }}
-              name="revenue"
-              isAnimationActive={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      )}
+      <ResponsiveContainer width="100%" height={280}>
+        <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+          <YAxis tickFormatter={(v) => `£${(v / 1000).toFixed(1)}k`} tick={{ fontSize: 12 }} />
+          <Tooltip
+            formatter={(value, name) => {
+              if (name === 'revenue') return [formatCurrency(value as number), 'Revenue']
+              return [value, name]
+            }}
+          />
+          <Legend />
+          <Line
+            type="monotone"
+            dataKey="revenue"
+            stroke="#6D071A"
+            strokeWidth={2}
+            dot={{ fill: '#6D071A', r: 4 }}
+            name="revenue"
+            isAnimationActive={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   )
 }
+

@@ -72,7 +72,7 @@ apiClient.interceptors.response.use(
 
     // ── 429 Too Many Requests — rate limited, don't crash the UI ────────────
     if (error.response?.status === 429) {
-      const pollingEndpoints = ['/orders/live', '/orders/awaiting-payment', '/tables', '/notifications', '/analytics']
+      const pollingEndpoints = ['/orders/live', '/orders/awaiting-payment', '/tables', '/notifications']
       const isPolling = pollingEndpoints.some((p) => requestPath.includes(p))
       if (isPolling) {
         console.warn('[Axios] Rate limited (429) on polling endpoint', requestPath, '— returning empty result silently')
