@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 37 50% 96%;
+    --foreground: 345 90% 25%;
+    --card: 0 0% 100%;
+    --card-foreground: 345 90% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 345 90% 15%;
+    --primary: 345 90% 23%;
+    --primary-foreground: 37 50% 96%;
+    --secondary: 37 60% 87%;
+    --secondary-foreground: 345 90% 23%;
+    --muted: 37 30% 92%;
+    --muted-foreground: 345 30% 45%;
+    --accent: 212 59% 30%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 37 20% 85%;
+    --input: 37 20% 85%;
+    --ring: 345 90% 23%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  h1, h2, h3 {
+    @apply font-serif;
+  }
+}
+
+@layer utilities {
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #D4AF37, #F5E6CC, #D4AF37);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-luxury {
+    background: linear-gradient(135deg, #6D071A 0%, #4A0512 100%);
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #D4AF37 #F5E6CC;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #F5E6CC;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #D4AF37;
+    border-radius: 3px;
+  }
+}
+
+/* Print styles — individual pages control their own layout */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Skeleton shimmer animation */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
