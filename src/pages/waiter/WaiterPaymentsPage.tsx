@@ -44,6 +44,7 @@ export function WaiterPaymentsPage() {
       qc.invalidateQueries({ queryKey: ['receipts'] })
       qc.invalidateQueries({ queryKey: ['tables'] })
       qc.invalidateQueries({ queryKey: ['hq-dashboard'] })
+      qc.invalidateQueries({ queryKey: ['revenue-trend'] })
       toast({ title: 'Payment processed — order moved to Receipts', variant: 'success' })
     },
     onError: (err: unknown) => {

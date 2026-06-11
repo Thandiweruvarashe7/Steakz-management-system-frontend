@@ -63,11 +63,12 @@ export function RevenueChart({ data: dataProp, title = 'Revenue This Week', bran
         date: formatDateLabel(p.date),
       }))
     },
-    staleTime: Infinity,
-    gcTime: Infinity,
+    staleTime: 30_000,
+    gcTime: 300_000,
     placeholderData: keepPreviousData,
-    refetchOnMount: false,
+    refetchOnMount: true,
     refetchOnWindowFocus: false,
+    refetchInterval: 60_000,
     refetchIntervalInBackground: false,
   })
 

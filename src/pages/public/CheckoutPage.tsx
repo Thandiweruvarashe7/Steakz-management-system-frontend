@@ -147,6 +147,7 @@ export function CheckoutPage() {
       qc.invalidateQueries({ queryKey: ['orders'] })
       qc.invalidateQueries({ queryKey: ['orders', 'my'] })
       qc.invalidateQueries({ queryKey: ['hq-dashboard'] })
+      qc.invalidateQueries({ queryKey: ['revenue-trend'] })
 
       toast({
         title: 'Order placed successfully!',
